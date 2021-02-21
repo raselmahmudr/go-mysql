@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"hello/src/database"
@@ -9,7 +8,6 @@ import (
 )
 
 type User struct {
-	
 	ID uint `gorm:"primaryKey" json:"id"`
 	Username string `json:"username"`
 	Email string `json:"email"`
@@ -17,23 +15,53 @@ type User struct {
 }
 type Post struct {
 	ID uint `json:"id"`
-	Title string `gorm:"size:60" json:"title"`
-	AuthorID string `gorm:"foreignKey=id" json:"author_id"`
-	Author User `gorm:"references:id" json:"author"`
+	Title string `gorm:"size:10" json:"title"`
+	UserID string `gorm:"ForeignKey:id"`
+	User User `json:"author"`
 }
+
 
 
 func main() {
 	
 	db, _ := database.Connect()
-	err := db.Debug().AutoMigrate(&User{}, &Post{})
+	db.Migrator().DropTable(&User{}, &Post{})
+	
+	err := db.AutoMigrate(&User{}, &Post{})
+	// We need to add foreign keys manually.
+	// db.Model(&Post{})
+	
+	
+	
+	db.Create(&User{
+		Username: "rasel",
+		Email:    "rasel@gmail.com",
+		Password: "123",
+	})
+	db.Create(&Post{
+		Title:  "dummy post",
+		UserID: "1",
+	})
+	
 	if err != nil {
 		log.Fatal(err)
 	}
-	var allPosts Post
-	db.Model(&Post{}).Select("*").Joins("left join users on users.id = posts.author_id").Scan(&allPosts)
-	st, _:=json.Marshal(allPosts)
-	fmt.Println(string(st))
+	var users User
+	// db.Preload("Post").Find(&users)
+	//
+ db.Raw(`
+		SELECT * FROM posts
+			join users
+		on users.id = posts.user_id
+		FOR JSON AUTO
+`).Scan(&users)
 	
+
+	fmt.Println(users)
 	
+	// var allPosts Post
+	// db.Preload("User").First(&allPosts)
+	// st, _:=json.Marshal(allPosts)
+	// fmt.Println(string(st))
+
 }
