@@ -1,47 +1,53 @@
 package main
 
 import (
-	"fmt"
-	_ "github.com/go-sql-driver/mysql"
-	"hello/controllers"
-	"hello/database"
-	"hello/models"
-	"net/http"
+	"database/sql"
+	_ "database/sql"
+	"log"
 )
+
+
+
+
+func dbConnection () *sql.DB {
+	dbDriver:= "mysql"
+	dbUser:= "root"
+	dbPass:= "123"
+	dbName:= "mydb"
+	db, err := sql.Open(dbDriver, dbUser + ":" + dbPass + "@/" + dbName )
+	if err != nil {
+		log.Fatal(err)
+	}
+	return db
+}
 
 func main() {
 	
-	// http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
-	// 	var data interface{}
-	// 	json.NewDecoder(req.Body).Decode(&data)
-	//
-	//
-	// 	d := data.(map[string]interface{})
-	//
-	//
-	// 	newUser := models.User{
-	// 		Username: d["username"].(string),
-	// 		Email: d["email"].(string),
-	// 	}
-	//
-	// 	json.NewEncoder(res).Encode(newUser)
-	//
-	// })
 	
-	db := database.DB()
-	u:= models.User{}
-	u.Sync(db)
+	// db := database.DB_INIT()
+	// db.AutoMigrate(&Product{}, &User{})
 	
-	http.HandleFunc("/register", controllers.Register)
-	http.HandleFunc("/login", controllers.Login)
-	http.HandleFunc("/users", controllers.GetUsers)
+	// db.Create(&Product{Title: "Jeans Pant",		Price: 23.34})
+	// db.Create(&User{Username: "rasel", Email:"rasel@gmail.com",Password: "123"	})
+	
+	// var user User
+	// db.Where("username = ? ", "rasel").First(&user)
+	// fmt.Println(user)
+	//
+	//
+	// http.HandleFunc("/register", controllers.Register)
+	// http.HandleFunc("/login", controllers.Login)
+	// http.HandleFunc("/users", controllers.GetUsers)
 	
 	
-	fmt.Println("Server is running on port 4000")
-	if err := http.ListenAndServe(":4000", nil); err != nil {
-		fmt.Println(err)
-	}
+	// fmt.Println("Server is running on port 4000")
+	// if err := http.ListenAndServe(":4000", nil); err != nil {
+	// 	fmt.Println(err)
+	// }
 }
+
+
+
 
 
 

@@ -4,6 +4,6 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "go": "nodemon -e go,js,css,gohtml  --exec go run main.go"
+    "go": "nodemon -e go,js,css,gohtml  --exec go run src/server.go"
   }
 }
